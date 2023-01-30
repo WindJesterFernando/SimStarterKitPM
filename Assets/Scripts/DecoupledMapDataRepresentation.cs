@@ -282,41 +282,47 @@ public class MapData
 
         //
 
+        if(start.x == end.x && start.y == end.y)
+            return true;
+
         LinkedList<TileLocation> checkedTileLocations = new LinkedList<TileLocation>();
-        LinkedList<TileLocation> toBeCheckedTileLocations = new LinkedList<TileLocation>();
+        LinkedList<TileLocation> toBeCheckedTileLocations;// = new LinkedList<TileLocation>();
 
-        foreach (TileLocation tl in GetTraversableNeighbours(start.x, start.y))
-        {
-            if (tl.x == end.x && tl.y == end.y)
-                return true;
+        // foreach (TileLocation tl in GetTraversableNeighbours(start.x, start.y))
+        // {
+        //     if (tl.x == end.x && tl.y == end.y)
+        //         return true;
 
-            toBeCheckedTileLocations.AddLast(tl);
-        }
+        //     toBeCheckedTileLocations.AddLast(tl);
+        // }
 
+        toBeCheckedTileLocations = GetTraversableNeighbours(start.x, start.y);
         checkedTileLocations.AddLast(start);
 
-
-        foreach (TileLocation tl in toBeCheckedTileLocations)
+        // foreach (TileLocation tl in toBeCheckedTileLocations)
+        while(toBeCheckedTileLocations.Count > 0)
         {
-            if (tl.x == end.x && tl.y == end.y)
+            TileLocation tileToCheck = toBeCheckedTileLocations.First.Value;
+            toBeCheckedTileLocations.RemoveFirst();
+
+            if (tileToCheck.x == end.x && tileToCheck.y == end.y)
                 return true;
 
-            if (DoesListContainTileLocation(tl, checkedTileLocations))
-                continue;
+            // if (DoesListContainTileLocation(tl, checkedTileLocations))
+            //     continue;
 
-            checkedTileLocations.AddLast(tl);
+            checkedTileLocations.AddLast(tileToCheck);
 
-            foreach (TileLocation tl2 in GetTraversableNeighbours(tl.x, tl.y))
+            foreach (TileLocation tl in GetTraversableNeighbours(tileToCheck.x, tileToCheck.y))
             {
-                if (!DoesListContainTileLocation(tl, checkedTileLocations))
-                    toBeCheckedTileLocations.AddLast(tl2);
+                if (DoesListContainTileLocation(tl, checkedTileLocations))
+                    continue;
+                if (DoesListContainTileLocation(tl, toBeCheckedTileLocations))
+                    continue;
+                
+                toBeCheckedTileLocations.AddLast(tl);
             }
         }
-
-
-
-
-
 
         return false;
     }
@@ -324,7 +330,6 @@ public class MapData
 
     private bool DoesListContainTileLocation(TileLocation tl, LinkedList<TileLocation> list)
     {
-
         foreach (TileLocation t in list)
         {
             if (t.x == tl.x && t.y == tl.y)
