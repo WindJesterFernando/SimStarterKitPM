@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public partial class TileEditorLogic : MonoBehaviour
 {
@@ -132,7 +133,7 @@ public partial class TileEditorLogic : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            if (MapData.instance.DoesPathExist(new TileLocation(0, 0), new TileLocation(6, 6)))
+            if (MapData.instance.DoesPathExist(new TileLocation(0, 0), new TileLocation(10, 10)))
                 Debug.Log("Path Found!!!");
             else
                 Debug.Log("Path Not Found!!!");

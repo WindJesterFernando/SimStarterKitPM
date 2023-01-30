@@ -282,7 +282,7 @@ public class MapData
 
         //
 
-        if(start.x == end.x && start.y == end.y)
+        if (start.x == end.x && start.y == end.y)
             return true;
 
         LinkedList<TileLocation> checkedTileLocations = new LinkedList<TileLocation>();
@@ -299,8 +299,13 @@ public class MapData
         toBeCheckedTileLocations = GetTraversableNeighbours(start.x, start.y);
         checkedTileLocations.AddLast(start);
 
+        Debug.Log("********");
+        Debug.Log("Initial Neighbours:");
+        foreach (TileLocation tl in toBeCheckedTileLocations)
+            Debug.Log(tl.x + "," + tl.y);
+
         // foreach (TileLocation tl in toBeCheckedTileLocations)
-        while(toBeCheckedTileLocations.Count > 0)
+        while (toBeCheckedTileLocations.Count > 0)
         {
             TileLocation tileToCheck = toBeCheckedTileLocations.First.Value;
             toBeCheckedTileLocations.RemoveFirst();
@@ -319,8 +324,10 @@ public class MapData
                     continue;
                 if (DoesListContainTileLocation(tl, toBeCheckedTileLocations))
                     continue;
-                
+
                 toBeCheckedTileLocations.AddLast(tl);
+
+                Debug.Log("Adding: " + tl.x + "," + tl.y);
             }
         }
 
