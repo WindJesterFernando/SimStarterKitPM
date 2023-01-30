@@ -4,6 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
+using Newtonsoft.Json;
+using System.IO;
+
+//using System.Text.Json;
+
 public partial class TileEditorLogic : MonoBehaviour
 {
     public static GameObject tileEditorLogic;
@@ -131,15 +136,86 @@ public partial class TileEditorLogic : MonoBehaviour
         //     DestoryMapVisuals();
 
 
+        // if (Input.GetKeyDown(KeyCode.A))
+        // {
+        //     if (MapData.instance.DoesPathExist(new TileLocation(0, 0), new TileLocation(10, 10)))
+        //         Debug.Log("Path Found!!!");
+        //     else
+        //         Debug.Log("Path Not Found!!!");
+        // }
+
+        // if (Input.GetKeyDown(KeyCode.A))
+        // {
+        //     DummyClass dc = new DummyClass();
+
+        //     //JsonSerializer s = new JsonSerializer();
+
+
+        //     // string jsonData = JsonConvert.SerializeObject(dc);
+
+        //     // //Debug.Log(jsonData);
+
+
+
+
+        //     String filePath = Application.persistentDataPath + Path.DirectorySeparatorChar + "saveThing.txt";
+
+        //     // StreamWriter sw = new StreamWriter(filePath);
+        //     // sw.WriteLine(jsonData);
+        //     // sw.Close();
+
+        //     Debug.Log(Application.persistentDataPath);
+
+        //     StreamReader sr = new StreamReader(filePath);
+        //     string jsonReadData = sr.ReadLine();
+
+        //     DummyClass otherDC = JsonConvert.DeserializeObject<DummyClass>(jsonReadData);
+
+        //     Debug.Log(otherDC.sad);
+
+        // }
+
+
+        // if (Input.GetKeyDown(KeyCode.A))
+        //     MapData.instance.SerializeMapData();
+
+
         if (Input.GetKeyDown(KeyCode.A))
         {
-            if (MapData.instance.DoesPathExist(new TileLocation(0, 0), new TileLocation(10, 10)))
-                Debug.Log("Path Found!!!");
-            else
-                Debug.Log("Path Not Found!!!");
-
-
+            MapData.instance.DeserializeAndLoadMapData();
+            DestoryMapVisuals();
+            CreateMapVisuals();
         }
+
+
+
+
+        //JsonConvert.DeserializeObject<dynamic>(jsonData);
+
+            // LinkedList<string> lines = new LinkedList<string>();
+
+            // using (StreamReader r = new StreamReader("sets.json"))
+            // {
+            //     var jsonData = r.ReadToEnd();
+            //     var item = JsonConvert.DeserializeObject<dynamic>(jsonData);
+
+            //     foreach (var s in item.data)
+            //     {
+            //         string line = "";
+            //         // try
+            //         // {
+            //         //     Console.WriteLine(s.fjgdjgjg);
+            //         // }
+            //         // catch
+            //         // {
+
+            //         // }
+            //         line = s.name + "," + s.search_uri + "," + ((string)s.block) + "," + ((string)s.code) + "," + s.set_type;
+            //         Console.WriteLine(line);
+            //         lines.AddLast(line);
+            //     }
+            // }
+
     }
 
 
@@ -234,3 +310,14 @@ public partial class TileEditorLogic : MonoBehaviour
 
 }
 
+public class DummyClass
+{
+    public int sad = 404;
+    public int dsgdg = 535;
+    public int hfdsfefrghreg = 213;
+    public string stringTHing = "sdvdsg";
+
+    public string stringTHing2 = "sdvdsg";
+
+    public string stringTHing3 = "sdvdsg";
+}

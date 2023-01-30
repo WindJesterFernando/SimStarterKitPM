@@ -3,6 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+using Newtonsoft.Json;
+using System.IO;
+
+
+// public static class MapDataInstance
+// {
+
+
+// }
+
 public class MapData
 {
 
@@ -402,6 +412,30 @@ public class MapData
     }
 
 
+
+    public void SerializeMapData()
+    {
+        string jsonData = JsonConvert.SerializeObject(this);
+
+        Debug.Log(jsonData);
+
+        string filePath = Application.persistentDataPath + Path.DirectorySeparatorChar + "saveThing.txt";
+
+        StreamWriter sw = new StreamWriter(filePath);
+        sw.WriteLine(jsonData);
+        sw.Close();
+    }
+
+    public void DeserializeAndLoadMapData()
+    {
+        string filePath = Application.persistentDataPath + Path.DirectorySeparatorChar + "saveThing.txt";
+        StreamReader sr = new StreamReader(filePath);
+        string jsonReadData = sr.ReadLine();
+
+        MapData md = JsonConvert.DeserializeObject<MapData>(jsonReadData);
+
+        MapData.instance = md;
+    }
 
 }
 
