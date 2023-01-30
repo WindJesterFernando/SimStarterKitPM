@@ -41,8 +41,8 @@ public partial class TileEditorLogic : MonoBehaviour
         TileEditorLogic.tileEditorLogic = this.gameObject;
 
         TextureSpriteID.Init();
-        MapData.mapData = new MapData();
-        MapData.mapData.Init();
+        MapData.instance = new MapData();
+        MapData.instance.Init();
         ContentLoader.Init();
         ConnectToSceneCanvasUI();
 
@@ -87,8 +87,8 @@ public partial class TileEditorLogic : MonoBehaviour
             tileButton.gameObject.AddComponent<BoxCollider2D>();
             tileButton.gameObject.AddComponent<EditorButton>();
             tileButton.gameObject.GetComponent<EditorButton>().SetMapObjectTypeAndTextureID(MapObjectTypeID.Sprite, tileID);
-            
-            if(tileID != TextureSpriteID.SpriteEraser)
+
+            if (tileID != TextureSpriteID.SpriteEraser)
                 tileButton.gameObject.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
 
             tileButton.transform.parent = spriteButtonsContainerParent.transform;
@@ -118,14 +118,27 @@ public partial class TileEditorLogic : MonoBehaviour
         // if(Input.GetKeyDown(KeyCode.S))
         //     CreateMapVisuals();
 
-        if(Input.GetKeyDown(KeyCode.A))
-        {
-            MapData.mapData.DoTheConwayThing();
-            DestoryMapVisuals();
-            CreateMapVisuals();
-        }
+        // if(Input.GetKeyDown(KeyCode.A))
+        // {
+        //     MapData.mapData.DoTheConwayThing();
+        //     DestoryMapVisuals();
+        //     CreateMapVisuals();
+        // }
+
+
+
         //     DestoryMapVisuals();
 
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            if (MapData.instance.DoesPathExist(new TileLocation(0, 0), new TileLocation(6, 6)))
+                Debug.Log("Path Found!!!");
+            else
+                Debug.Log("Path Not Found!!!");
+
+
+        }
     }
 
 
@@ -134,16 +147,16 @@ public partial class TileEditorLogic : MonoBehaviour
         mapTilesContainerParent = new GameObject("MapTilesContainerParent");
         mapSpritesContainerParent = new GameObject("MapSpritesContainerParent");
 
-        mapTiles = new GameObject[MapData.mapData.numTilesX, MapData.mapData.numTilesY];
+        mapTiles = new GameObject[MapData.instance.numTilesX, MapData.instance.numTilesY];
 
-        Vector3 TopLeftOfLayout = new Vector3(-(float)MapData.mapData.numTilesX / 2f * tileVisualSize + (tileVisualSize / 2f), -(float)MapData.mapData.numTilesY / 2f * tileVisualSize + (tileVisualSize / 2), 0);
+        Vector3 TopLeftOfLayout = new Vector3(-(float)MapData.instance.numTilesX / 2f * tileVisualSize + (tileVisualSize / 2f), -(float)MapData.instance.numTilesY / 2f * tileVisualSize + (tileVisualSize / 2), 0);
         Vector3 currentPos = TopLeftOfLayout;
 
-        for (int i = 0; i < MapData.mapData.numTilesX; i++)
+        for (int i = 0; i < MapData.instance.numTilesX; i++)
         {
-            for (int j = 0; j < MapData.mapData.numTilesY; j++)
+            for (int j = 0; j < MapData.instance.numTilesY; j++)
             {
-                mapTiles[i, j] = ContentLoader.GetNewMapTileGameObject(MapData.mapData.mapTiles[i, j]);
+                mapTiles[i, j] = ContentLoader.GetNewMapTileGameObject(MapData.instance.mapTiles[i, j]);
                 mapTiles[i, j].transform.parent = mapTilesContainerParent.transform;
                 mapTiles[i, j].transform.position = currentPos;
                 currentPos.y += tileVisualSize;
@@ -152,7 +165,7 @@ public partial class TileEditorLogic : MonoBehaviour
             currentPos.x += tileVisualSize;
         }
 
-        foreach (MapSpriteDataRepresentation s in MapData.mapData.mapSprites)
+        foreach (MapSpriteDataRepresentation s in MapData.instance.mapSprites)
         {
             GameObject go = ContentLoader.GetNewMapSpriteGameObject(s.id);
             go.transform.parent = mapSpritesContainerParent.transform;
@@ -161,6 +174,7 @@ public partial class TileEditorLogic : MonoBehaviour
             go.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
         }
     }
+
     public void DestoryMapVisuals()
     {
         Destroy(mapTilesContainerParent);
@@ -182,29 +196,29 @@ public partial class TileEditorLogic : MonoBehaviour
             return;
         }
 
-        MapData.mapData.ProcessResize(x, y);
+        MapData.instance.ProcessResize(x, y);
         DestoryMapVisuals();
         CreateMapVisuals();
     }
     public void SaveButtonPressed()
     {
         string fileName = canvasFileNameInputField.GetComponent<InputField>().text;
-        MapData.mapData.ProcessSaveMap(fileName);
+        MapData.instance.ProcessSaveMap(fileName);
     }
     public void LoadButtonPressed()
     {
         string fileName = canvasFileNameInputField.GetComponent<InputField>().text;
-        MapData.mapData.ProcessLoadMap(fileName);
+        MapData.instance.ProcessLoadMap(fileName);
     }
     public void MapTilePressed(GameObject sender)
     {
-        for (int i = 0; i < MapData.mapData.numTilesX; i++)
+        for (int i = 0; i < MapData.instance.numTilesX; i++)
         {
-            for (int j = 0; j < MapData.mapData.numTilesY; j++)
+            for (int j = 0; j < MapData.instance.numTilesY; j++)
             {
                 if (mapTiles[i, j] == sender)
                 {
-                    MapData.mapData.ProcessMapTilePressed(i, j);
+                    MapData.instance.ProcessMapTilePressed(i, j);
                 }
             }
         }
@@ -214,7 +228,7 @@ public partial class TileEditorLogic : MonoBehaviour
     }
     public void EditorButtonPressed(int mapObjectType, int textureID)
     {
-        MapData.mapData.ProcessEditorButtonPressed(mapObjectType, textureID);
+        MapData.instance.ProcessEditorButtonPressed(mapObjectType, textureID);
     }
 
 }

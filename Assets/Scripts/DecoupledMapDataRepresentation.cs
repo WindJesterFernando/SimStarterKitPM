@@ -6,7 +6,7 @@ using UnityEngine;
 public class MapData
 {
 
-    static public MapData mapData;
+    static public MapData instance;
 
     public int[,] mapTiles;
     public LinkedList<MapSpriteDataRepresentation> mapSprites;
@@ -132,16 +132,6 @@ public class MapData
 
         foreach (MapSpriteDataRepresentation s in mapSprites)
             c.mapSprites.AddLast(s.DeepCopy());
-
-
-        //c.numTilesX = 99999;
-
-        // foreach(MapSpriteDataRepresentation s in mapSprites)
-        // {
-        //     MapSpriteDataRepresentation deepCopy = new MapSpriteDataRepresentation(s.id, s.x, s.y);
-        //     c.mapSprites.AddLast(deepCopy);
-        // }
-
 
         return c;
 
@@ -277,6 +267,124 @@ public class MapData
 
     }
 
+
+    public bool DoesPathExist(TileLocation start, TileLocation end)
+    {
+        //if (mapTiles[i, j] == TextureSpriteID.Water)
+
+        //GetTraversableNeighbours()
+
+        //mark neighbours as checked
+        //get neighbours' neighbours
+
+        //looping through GetTraversableNeighbours()
+        //check if one of the neighbors == end
+
+        //
+
+        LinkedList<TileLocation> checkedTileLocations = new LinkedList<TileLocation>();
+        LinkedList<TileLocation> toBeCheckedTileLocations = new LinkedList<TileLocation>();
+
+        foreach(TileLocation tl in GetTraversableNeighbours(start.x, start.y))
+        {
+            if(tl.x == end.x && tl.y == end.y)
+                return true;
+
+            toBeCheckedTileLocations.AddLast(tl);
+        }
+
+        checkedTileLocations.AddLast(start);
+
+
+        foreach(TileLocation tl in toBeCheckedTileLocations)
+        {
+            if(tl.x == end.x && tl.y == end.y)
+                return true;
+
+            if(DoesListContainTileLocation(tl, checkedTileLocations))
+                continue;
+
+            toBeCheckedTileLocations.AddLast(tl);
+        }
+
+
+
+
+
+
+        return false;
+    }
+     
+
+    private bool DoesListContainTileLocation(TileLocation tl, LinkedList<TileLocation> list)
+    {
+
+        foreach(TileLocation t in list)
+        {
+            if(t.x == tl.x && t.y == tl.y)
+                return true;
+        }
+
+        return false;
+    }
+
+
+     public LinkedList<TileLocation> GetTraversableNeighbours(int x, int y)
+    {
+        LinkedList<TileLocation> neighbours = new LinkedList<TileLocation>();
+
+        if (y < numTilesY - 1)
+        {
+            if (mapTiles[x, y + 1] == TextureSpriteID.Grass)
+                neighbours.AddLast(new TileLocation(x, y + 1));
+        }
+
+        if (y < numTilesY - 1 && x < numTilesX - 1)
+        {
+            if (mapTiles[x + 1, y + 1] == TextureSpriteID.Grass)
+                neighbours.AddLast(new TileLocation(x + 1, y + 1));
+        }
+
+        if (x < numTilesX - 1)
+        {
+            if (mapTiles[x + 1, y] == TextureSpriteID.Grass)
+                neighbours.AddLast(new TileLocation(x + 1, y));
+        }
+
+        if (x < numTilesX - 1 && y > 0)
+        {
+            if (mapTiles[x + 1, y - 1] == TextureSpriteID.Grass)
+                neighbours.AddLast(new TileLocation(x + 1, y - 1));
+        }
+
+        if (y > 0)
+        {
+            if (mapTiles[x, y - 1] == TextureSpriteID.Grass)
+                neighbours.AddLast(new TileLocation(x, y - 1));
+        }
+
+        if (x > 0 && y > 0)
+        {
+            if (mapTiles[x - 1, y - 1] == TextureSpriteID.Grass)
+                neighbours.AddLast(new TileLocation(x - 1, y - 1));
+        }
+        if (x > 0)
+        {
+            if (mapTiles[x - 1, y] == TextureSpriteID.Grass)
+                neighbours.AddLast(new TileLocation(x - 1, y));
+        }
+        if (x > 0 && y < numTilesY - 1)
+        {
+            if (mapTiles[x - 1, y + 1] == TextureSpriteID.Grass)
+                neighbours.AddLast(new TileLocation(x - 1, y + 1));
+        }
+
+        return neighbours;
+
+    }
+
+    
+
 }
 
 public class MapSpriteDataRepresentation
@@ -302,6 +410,17 @@ public static class MapObjectTypeID
 {
     public const int Tile = 1;
     public const int Sprite = 2;
+}
+
+public class TileLocation
+{
+    public int x,y;
+
+    public TileLocation(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
 }
 
 
