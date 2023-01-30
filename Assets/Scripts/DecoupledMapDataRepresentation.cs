@@ -149,19 +149,19 @@ public class MapData
                 {
                     int count = GetNeighbourCount(i, j);
 
-                    if(count == 2 || count == 3)
-                        nextGenMapTiles[i,j] = TextureSpriteID.Grass;
+                    if (count == 2 || count == 3)
+                        nextGenMapTiles[i, j] = TextureSpriteID.Grass;
                     else
-                        nextGenMapTiles[i,j] = TextureSpriteID.Water;
+                        nextGenMapTiles[i, j] = TextureSpriteID.Water;
                 }
                 else
                 {
                     int count = GetNeighbourCount(i, j);
 
-                    if(count == 3)
-                        nextGenMapTiles[i,j] = TextureSpriteID.Grass;
+                    if (count == 3)
+                        nextGenMapTiles[i, j] = TextureSpriteID.Grass;
                     else
-                        nextGenMapTiles[i,j] = TextureSpriteID.Water;
+                        nextGenMapTiles[i, j] = TextureSpriteID.Water;
                 }
 
                 // if(mapTiles[i, j] == TextureSpriteID.Grass)
@@ -285,9 +285,9 @@ public class MapData
         LinkedList<TileLocation> checkedTileLocations = new LinkedList<TileLocation>();
         LinkedList<TileLocation> toBeCheckedTileLocations = new LinkedList<TileLocation>();
 
-        foreach(TileLocation tl in GetTraversableNeighbours(start.x, start.y))
+        foreach (TileLocation tl in GetTraversableNeighbours(start.x, start.y))
         {
-            if(tl.x == end.x && tl.y == end.y)
+            if (tl.x == end.x && tl.y == end.y)
                 return true;
 
             toBeCheckedTileLocations.AddLast(tl);
@@ -296,15 +296,21 @@ public class MapData
         checkedTileLocations.AddLast(start);
 
 
-        foreach(TileLocation tl in toBeCheckedTileLocations)
+        foreach (TileLocation tl in toBeCheckedTileLocations)
         {
-            if(tl.x == end.x && tl.y == end.y)
+            if (tl.x == end.x && tl.y == end.y)
                 return true;
 
-            if(DoesListContainTileLocation(tl, checkedTileLocations))
+            if (DoesListContainTileLocation(tl, checkedTileLocations))
                 continue;
 
-            toBeCheckedTileLocations.AddLast(tl);
+            checkedTileLocations.AddLast(tl);
+
+            foreach (TileLocation tl2 in GetTraversableNeighbours(tl.x, tl.y))
+            {
+                if (!DoesListContainTileLocation(tl, checkedTileLocations))
+                    toBeCheckedTileLocations.AddLast(tl2);
+            }
         }
 
 
@@ -314,14 +320,14 @@ public class MapData
 
         return false;
     }
-     
+
 
     private bool DoesListContainTileLocation(TileLocation tl, LinkedList<TileLocation> list)
     {
 
-        foreach(TileLocation t in list)
+        foreach (TileLocation t in list)
         {
-            if(t.x == tl.x && t.y == tl.y)
+            if (t.x == tl.x && t.y == tl.y)
                 return true;
         }
 
@@ -329,7 +335,7 @@ public class MapData
     }
 
 
-     public LinkedList<TileLocation> GetTraversableNeighbours(int x, int y)
+    public LinkedList<TileLocation> GetTraversableNeighbours(int x, int y)
     {
         LinkedList<TileLocation> neighbours = new LinkedList<TileLocation>();
 
@@ -383,7 +389,7 @@ public class MapData
 
     }
 
-    
+
 
 }
 
@@ -414,7 +420,7 @@ public static class MapObjectTypeID
 
 public class TileLocation
 {
-    public int x,y;
+    public int x, y;
 
     public TileLocation(int x, int y)
     {
