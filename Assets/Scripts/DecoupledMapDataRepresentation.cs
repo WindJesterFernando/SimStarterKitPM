@@ -27,6 +27,8 @@ public class MapData
     int selectedEditorButtonTextureID;
     int selectedEditorButtonMapObjectType;
 
+    Queue<ShowTileMoveContainer> showTileMoveContainers;
+
     public void Init()
     {
         CreateMapTiles();
@@ -280,16 +282,8 @@ public class MapData
 
     public bool DoesPathExist(TileLocation start, TileLocation end)
     {
-        //if (mapTiles[i, j] == TextureSpriteID.Water)
-
-        //GetTraversableNeighbours()
-
-        //mark neighbours as checked
-        //get neighbours' neighbours
-
-        //looping through GetTraversableNeighbours()
-        //check if one of the neighbors == end
-
+        //something-someting to determine shortest possible path
+        //prioritize next step to be taken by the shortest possible path
         //
 
         if (start.x == end.x && start.y == end.y)
@@ -297,14 +291,6 @@ public class MapData
 
         LinkedList<TileLocation> checkedTileLocations = new LinkedList<TileLocation>();
         LinkedList<TileLocation> toBeCheckedTileLocations;// = new LinkedList<TileLocation>();
-
-        // foreach (TileLocation tl in GetTraversableNeighbours(start.x, start.y))
-        // {
-        //     if (tl.x == end.x && tl.y == end.y)
-        //         return true;
-
-        //     toBeCheckedTileLocations.AddLast(tl);
-        // }
 
         toBeCheckedTileLocations = GetTraversableNeighbours(start.x, start.y);
         checkedTileLocations.AddLast(start);
@@ -314,7 +300,6 @@ public class MapData
         foreach (TileLocation tl in toBeCheckedTileLocations)
             Debug.Log(tl.x + "," + tl.y);
 
-        // foreach (TileLocation tl in toBeCheckedTileLocations)
         while (toBeCheckedTileLocations.Count > 0)
         {
             TileLocation tileToCheck = toBeCheckedTileLocations.First.Value;
@@ -322,9 +307,6 @@ public class MapData
 
             if (tileToCheck.x == end.x && tileToCheck.y == end.y)
                 return true;
-
-            // if (DoesListContainTileLocation(tl, checkedTileLocations))
-            //     continue;
 
             checkedTileLocations.AddLast(tileToCheck);
 
@@ -344,6 +326,100 @@ public class MapData
         return false;
     }
 
+    public bool DoAStarThing(TileLocation start, TileLocation end)
+    {
+        showTileMoveContainers = new Queue<ShowTileMoveContainer>();
+
+        //something-someting to determine shortest possible path
+        //prioritize next step to be taken by the shortest possible path
+        //
+
+        if (start.x == end.x && start.y == end.y)
+            return true;
+
+        LinkedList<TileLocation> checkedTileLocations = new LinkedList<TileLocation>();
+        LinkedList<TileLocation> toBeCheckedTileLocations = new LinkedList<TileLocation>();
+
+        foreach (TileLocation tl in GetTraversableNeighbours(start.x, start.y))
+        {
+            tl.distanceToEndTile = GetDistanceBetweenTileLocations(tl, end);
+            toBeCheckedTileLocations.AddLast(tl);
+            showTileMoveContainers.Enqueue(new ShowTileMoveContainer(tl.x, tl.y, 0.2f, TextureSpriteID.WindmillTop));
+        }
+
+        checkedTileLocations.AddLast(start);
+        showTileMoveContainers.Enqueue(new ShowTileMoveContainer(start.x, start.y, 1f, TextureSpriteID.WindmillBase));
+        Debug.Log("********");
+        Debug.Log("Initial Neighbours:");
+        foreach (TileLocation tl in toBeCheckedTileLocations)
+            Debug.Log(tl.x + "," + tl.y);
+
+        while (toBeCheckedTileLocations.Count > 0)
+        {
+            //GetLowestCostFromList()
+
+            TileLocation lowestTile = null;
+
+            foreach (TileLocation tl in toBeCheckedTileLocations)
+            {
+                if (lowestTile == null)
+                    lowestTile = tl;
+                else if (lowestTile.distanceToEndTile > tl.distanceToEndTile)
+                    lowestTile = tl;
+            }
+
+
+            TileLocation tileToCheck = lowestTile;//toBeCheckedTileLocations.First.Value;
+            Debug.Log("Currently checking " + tileToCheck.x + "," + tileToCheck.y + "  : dist " + tileToCheck.distanceToEndTile);
+            toBeCheckedTileLocations.Remove(lowestTile);
+
+            showTileMoveContainers.Enqueue(new ShowTileMoveContainer(tileToCheck.x, tileToCheck.y, 1f, TextureSpriteID.WindmillBase));
+            if (tileToCheck.x == end.x && tileToCheck.y == end.y)
+                return true;
+
+            checkedTileLocations.AddLast(tileToCheck);
+            
+
+            //Debug.Log("Adding Traversable Neighbours--");
+            foreach (TileLocation tl in GetTraversableNeighbours(tileToCheck.x, tileToCheck.y))
+            {
+                if (DoesListContainTileLocation(tl, checkedTileLocations))
+                    continue;
+                if (DoesListContainTileLocation(tl, toBeCheckedTileLocations))
+                    continue;
+
+                tl.distanceToEndTile = GetDistanceBetweenTileLocations(tl, end);
+                toBeCheckedTileLocations.AddLast(tl);
+                showTileMoveContainers.Enqueue(new ShowTileMoveContainer(tl.x, tl.y, 0.2f, TextureSpriteID.WindmillTop));
+
+                //Debug.Log("Adding: " + tl.x + "," + tl.y + " : dist == " + GetDistanceBetweenTileLocations(tl, end));
+            }
+        }
+
+        return false;
+    }
+
+    public void UpdateShowMovePath()
+    {
+        if(showTileMoveContainers != null)
+        {
+            if(showTileMoveContainers.Count > 0)
+            {
+                ShowTileMoveContainer stmc = showTileMoveContainers.Peek();
+                stmc.holdTime -= Time.deltaTime;
+
+                if(stmc.holdTime <= 0)
+                {
+                    stmc = showTileMoveContainers.Dequeue();
+                    mapTiles[stmc.x, stmc.y] = stmc.tileToSet;
+                    TileEditorLogic.tileEditorLogic.GetComponent<TileEditorLogic>().DestoryMapVisuals();
+                    TileEditorLogic.tileEditorLogic.GetComponent<TileEditorLogic>().CreateMapVisuals();
+                }
+            }
+        }
+        
+        
+    }
 
     private bool DoesListContainTileLocation(TileLocation tl, LinkedList<TileLocation> list)
     {
@@ -367,11 +443,11 @@ public class MapData
                 neighbours.AddLast(new TileLocation(x, y + 1));
         }
 
-        if (y < numTilesY - 1 && x < numTilesX - 1)
-        {
-            if (mapTiles[x + 1, y + 1] == TextureSpriteID.Grass)
-                neighbours.AddLast(new TileLocation(x + 1, y + 1));
-        }
+        // if (y < numTilesY - 1 && x < numTilesX - 1)
+        // {
+        //     if (mapTiles[x + 1, y + 1] == TextureSpriteID.Grass)
+        //         neighbours.AddLast(new TileLocation(x + 1, y + 1));
+        // }
 
         if (x < numTilesX - 1)
         {
@@ -379,11 +455,11 @@ public class MapData
                 neighbours.AddLast(new TileLocation(x + 1, y));
         }
 
-        if (x < numTilesX - 1 && y > 0)
-        {
-            if (mapTiles[x + 1, y - 1] == TextureSpriteID.Grass)
-                neighbours.AddLast(new TileLocation(x + 1, y - 1));
-        }
+        // if (x < numTilesX - 1 && y > 0)
+        // {
+        //     if (mapTiles[x + 1, y - 1] == TextureSpriteID.Grass)
+        //         neighbours.AddLast(new TileLocation(x + 1, y - 1));
+        // }
 
         if (y > 0)
         {
@@ -391,26 +467,40 @@ public class MapData
                 neighbours.AddLast(new TileLocation(x, y - 1));
         }
 
-        if (x > 0 && y > 0)
-        {
-            if (mapTiles[x - 1, y - 1] == TextureSpriteID.Grass)
-                neighbours.AddLast(new TileLocation(x - 1, y - 1));
-        }
+        // if (x > 0 && y > 0)
+        // {
+        //     if (mapTiles[x - 1, y - 1] == TextureSpriteID.Grass)
+        //         neighbours.AddLast(new TileLocation(x - 1, y - 1));
+        // }
         if (x > 0)
         {
             if (mapTiles[x - 1, y] == TextureSpriteID.Grass)
                 neighbours.AddLast(new TileLocation(x - 1, y));
         }
-        if (x > 0 && y < numTilesY - 1)
-        {
-            if (mapTiles[x - 1, y + 1] == TextureSpriteID.Grass)
-                neighbours.AddLast(new TileLocation(x - 1, y + 1));
-        }
+        // if (x > 0 && y < numTilesY - 1)
+        // {
+        //     if (mapTiles[x - 1, y + 1] == TextureSpriteID.Grass)
+        //         neighbours.AddLast(new TileLocation(x - 1, y + 1));
+        // }
 
         return neighbours;
 
     }
 
+
+    private float GetDistanceBetweenTileLocations(TileLocation tl1, TileLocation tl2)
+    {
+        const float cardinalMovement = 10;
+        //const float diagonalMovement = 14;
+
+        float xDif = Mathf.Abs(tl1.x - tl2.x);
+        float yDif = Mathf.Abs(tl1.y - tl2.y);
+
+        float distance = cardinalMovement * (xDif + yDif);
+
+        return distance;
+
+    }
 
 
     public void SerializeMapData()
@@ -468,6 +558,10 @@ public class TileLocation
 {
     public int x, y;
 
+    public float distanceToEndTile;
+
+    //add variables, maybe distance from start/to end
+
     public TileLocation(int x, int y)
     {
         this.x = x;
@@ -475,24 +569,23 @@ public class TileLocation
     }
 }
 
-
-// public class MapDataDeepCopy
-// {
-//     public int[,] mapTiles;
-//     public LinkedList<MapSpriteDataRepresentation> mapSprites;
-
-//     public int numTilesX;
-//     public int numTilesY;
-
-// }
+//save dist variables on tile
+//Save path
+//save other ???? variables
+//Figure out the question to ask about why we are not generating a shortest path.
 
 
+public class ShowTileMoveContainer
+{
+    public int x, y;
+    public float holdTime;
+    public int tileToSet;
 
-
-
-
-// resize
-// Serialization and Deserialization
-// Unit test Input
-// Deep copy model data
-// Conway’s game of life
+    public ShowTileMoveContainer(int x, int y, float holdTime, int tileToSet)
+    {
+        this.x = x;
+        this.y = y;
+        this.holdTime = holdTime;
+        this.tileToSet = tileToSet;
+    }
+}

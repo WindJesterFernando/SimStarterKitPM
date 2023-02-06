@@ -136,13 +136,15 @@ public partial class TileEditorLogic : MonoBehaviour
         //     DestoryMapVisuals();
 
 
-        // if (Input.GetKeyDown(KeyCode.A))
-        // {
-        //     if (MapData.instance.DoesPathExist(new TileLocation(0, 0), new TileLocation(10, 10)))
-        //         Debug.Log("Path Found!!!");
-        //     else
-        //         Debug.Log("Path Not Found!!!");
-        // }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            if (MapData.instance.DoAStarThing(new TileLocation(0, 0), new TileLocation(10, 10)))
+                Debug.Log("Path Found!!!");
+            else
+                Debug.Log("Path Not Found!!!");
+        }
+
+        MapData.instance.UpdateShowMovePath();
 
         // if (Input.GetKeyDown(KeyCode.A))
         // {
@@ -180,12 +182,12 @@ public partial class TileEditorLogic : MonoBehaviour
         //     MapData.instance.SerializeMapData();
 
 
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            MapData.instance.DeserializeAndLoadMapData();
-            DestoryMapVisuals();
-            CreateMapVisuals();
-        }
+        // if (Input.GetKeyDown(KeyCode.A))
+        // {
+        //     MapData.instance.DeserializeAndLoadMapData();
+        //     DestoryMapVisuals();
+        //     CreateMapVisuals();
+        // }
 
 
 
@@ -219,7 +221,7 @@ public partial class TileEditorLogic : MonoBehaviour
     }
 
 
-    void CreateMapVisuals()
+    public void CreateMapVisuals()
     {
         mapTilesContainerParent = new GameObject("MapTilesContainerParent");
         mapSpritesContainerParent = new GameObject("MapSpritesContainerParent");
