@@ -178,16 +178,16 @@ public partial class TileEditorLogic : MonoBehaviour
         // }
 
 
-        // if (Input.GetKeyDown(KeyCode.A))
-        //     MapData.instance.SerializeMapData();
+        if (Input.GetKeyDown(KeyCode.D))
+            MapData.instance.SerializeMapData();
 
 
-        // if (Input.GetKeyDown(KeyCode.A))
-        // {
-        //     MapData.instance.DeserializeAndLoadMapData();
-        //     DestoryMapVisuals();
-        //     CreateMapVisuals();
-        // }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            MapData.instance.DeserializeAndLoadMapData();
+            DestoryMapVisuals();
+            CreateMapVisuals();
+        }
 
 
 
