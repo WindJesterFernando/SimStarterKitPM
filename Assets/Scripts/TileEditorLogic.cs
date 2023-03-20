@@ -136,15 +136,6 @@ public partial class TileEditorLogic : MonoBehaviour
         //     DestoryMapVisuals();
 
 
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            if (MapData.instance.DoAStarThing(new TileLocation(0, 0), new TileLocation(10, 10)))
-                Debug.Log("Path Found!!!");
-            else
-                Debug.Log("Path Not Found!!!");
-        }
-
-        MapData.instance.UpdateShowMovePath();
 
         // if (Input.GetKeyDown(KeyCode.A))
         // {
@@ -178,17 +169,45 @@ public partial class TileEditorLogic : MonoBehaviour
         // }
 
 
-        if (Input.GetKeyDown(KeyCode.D))
-            MapData.instance.SerializeMapData();
 
 
-        if (Input.GetKeyDown(KeyCode.F))
+        if(Input.GetKeyDown(KeyCode.I))
         {
-            MapData.instance.DeserializeAndLoadMapData();
-            DestoryMapVisuals();
-            CreateMapVisuals();
+            MapData.instance.EnqueueControl(new Control(ControlKey.keyI, ControlKeyState.Press));
+        }
+        if(Input.GetKeyDown(KeyCode.O))
+        {
+            MapData.instance.EnqueueControl(new Control(ControlKey.keyO, ControlKeyState.Press));
+        }
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            MapData.instance.EnqueueControl(new Control(ControlKey.keyP, ControlKeyState.Press));
         }
 
+
+
+        // if (Input.GetKeyDown(KeyCode.D))
+        //     MapData.instance.SerializeMapData();
+
+
+        // if (Input.GetKeyDown(KeyCode.F))
+        // {
+        //     MapData.instance.DeserializeAndLoadMapData();
+        //     DestoryMapVisuals();
+        //     CreateMapVisuals();
+        // }
+
+        // if (Input.GetKeyDown(KeyCode.A))
+        // {
+        //     if (MapData.instance.DoAStarThing(new TileLocation(0, 0), new TileLocation(10, 10)))
+        //         Debug.Log("Path Found!!!");
+        //     else
+        //         Debug.Log("Path Not Found!!!");
+        // }
+
+
+
+        MapData.instance.Update();
 
 
 

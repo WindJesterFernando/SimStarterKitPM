@@ -31,8 +31,11 @@ public class MapData
 
     public TileLocation[,] mapTileLocations;
 
+    Queue<ControlBase> controlQueue;
+
     public void Init()
     {
+        controlQueue = new Queue<ControlBase>();
         CreateMapTiles();
         mapSprites = new LinkedList<MapSpriteDataRepresentation>();
         mapSprites.AddLast(new MapSpriteDataRepresentation(TextureSpriteID.Fighter1, 10, 2));
@@ -357,7 +360,7 @@ public class MapData
         {
             tl.distanceToEndTile = GetDistanceBetweenTileLocations(tl, end);
             tl.connectingPreviousTile = start;
-            tl.heuristicCost = start.heuristicCost + 1;
+            tl.heuristicCost = start.heuristicCost + 10;
             toBeCheckedTileLocations.AddLast(tl);
             showTileMoveContainers.Enqueue(new ShowTileMoveContainer(tl.x, tl.y, 0.1f, TextureSpriteID.WindmillTop));
         }
@@ -365,10 +368,10 @@ public class MapData
 
         checkedTileLocations.AddLast(start);
         showTileMoveContainers.Enqueue(new ShowTileMoveContainer(start.x, start.y, 0.25f, TextureSpriteID.WindmillBase));
-        Debug.Log("********");
-        Debug.Log("Initial Neighbours:");
-        foreach (TileLocation tl in toBeCheckedTileLocations)
-            Debug.Log(tl.x + "," + tl.y);
+        // Debug.Log("********");
+        // Debug.Log("Initial Neighbours:");
+        // foreach (TileLocation tl in toBeCheckedTileLocations)
+        //     Debug.Log(tl.x + "," + tl.y);
 
         while (toBeCheckedTileLocations.Count > 0)
         {
@@ -376,8 +379,13 @@ public class MapData
 
             TileLocation lowestTile = null;
 
+
+            Debug.Log("****************");
             foreach (TileLocation tl in toBeCheckedTileLocations)
             {
+                //if()
+                Debug.Log("x = " + tl.x + ", y = " + tl.y +  ", h = " + tl.heuristicCost + ", e = " + tl.distanceToEndTile);
+
                 if (lowestTile == null)
                     lowestTile = tl;
                 else if (lowestTile.distanceToEndTile + lowestTile.heuristicCost > tl.distanceToEndTile + tl.heuristicCost)
@@ -392,8 +400,8 @@ public class MapData
             showTileMoveContainers.Enqueue(new ShowTileMoveContainer(lowestTile.x, lowestTile.y, 0.25f, TextureSpriteID.WindmillBase));
             if (lowestTile.x == end.x && lowestTile.y == end.y)
             {
-                Debug.Log("----FOUND-----");
-                Debug.Log(lowestTile.connectingPreviousTile.x + "," + lowestTile.connectingPreviousTile.y);
+                // Debug.Log("----FOUND-----");
+                // Debug.Log(lowestTile.connectingPreviousTile.x + "," + lowestTile.connectingPreviousTile.y);
                 TileLocation prev = lowestTile.connectingPreviousTile;
                 while (prev != null)
                 {
@@ -423,19 +431,19 @@ public class MapData
                 else if (tl.connectingPreviousTile == null)
                 {
                     tl.connectingPreviousTile = lowestTile;
-                    tl.heuristicCost = lowestTile.heuristicCost + 1;
-                    Debug.Log("Setting heuristic for " + tl.x + "," + tl.y + "  : h == " + tl.heuristicCost);
+                    tl.heuristicCost = lowestTile.heuristicCost + 10;
+                    //Debug.Log("Setting heuristic for " + tl.x + "," + tl.y + "  : h == " + tl.heuristicCost);
                 }
                 else
                 {
-                    Debug.Log("override being consider: " + tl.heuristicCost + ">" + (lowestTile.heuristicCost + 1));
-                    Debug.Log("override being consider for tile : " + tl.x + "," + tl.y);
+                    // Debug.Log("override being consider: " + tl.heuristicCost + ">" + (lowestTile.heuristicCost + 1));
+                    // Debug.Log("override being consider for tile : " + tl.x + "," + tl.y);
 
-                    if (tl.heuristicCost > lowestTile.heuristicCost + 1)
+                    if (tl.heuristicCost > lowestTile.heuristicCost + 10)
                     {
                         tl.connectingPreviousTile = lowestTile;
-                        tl.heuristicCost = lowestTile.heuristicCost + 1;
-                        Debug.Log("overriding: setting heuristic for " + tl.x + "," + tl.y + "  : h == " + tl.heuristicCost);
+                        tl.heuristicCost = lowestTile.heuristicCost + 10;
+                        //Debug.Log("overriding: setting heuristic for " + tl.x + "," + tl.y + "  : h == " + tl.heuristicCost);
                     }
                 }
 
@@ -460,7 +468,7 @@ public class MapData
         return false;
     }
 
-    public void UpdateShowMovePath()
+    public void Update()
     {
         if (showTileMoveContainers != null)
         {
@@ -478,6 +486,65 @@ public class MapData
                 }
             }
         }
+
+        while (controlQueue.Count > 0)
+        {
+            ControlBase cb = controlQueue.Dequeue();
+
+            if(cb.controlKey == ControlKey.keyI
+                && cb.controlKeyState == ControlKeyState.Press)
+            {
+                SerializeMapData();
+            }
+            else if(cb.controlKey == ControlKey.keyO
+                && cb.controlKeyState == ControlKeyState.Press)
+            {
+                DeserializeAndLoadMapData();
+                TileEditorLogic.tileEditorLogic.GetComponent<TileEditorLogic>().DestoryMapVisuals();
+                TileEditorLogic.tileEditorLogic.GetComponent<TileEditorLogic>().CreateMapVisuals();
+            }
+            else if(cb.controlKey == ControlKey.keyP
+                && cb.controlKeyState == ControlKeyState.Press)
+            {
+                DoAStarThing(new TileLocation(0, 0), new TileLocation(10, 10));
+            }
+
+
+            // if(cb is Control)
+            // {
+
+            // }
+
+            // if(cb.GetType() == typeof(CollectionBase))
+            // {
+
+            // }
+
+
+
+
+            //if(cb.controlKeyState == )
+        }
+
+
+        //         if (Input.GetKeyDown(KeyCode.D))
+        //     MapData.instance.
+
+
+        // if (Input.GetKeyDown(KeyCode.F))
+        // {
+        //     MapData.instance.
+        //     DestoryMapVisuals();
+        //     CreateMapVisuals();
+        // }
+
+        // if (Input.GetKeyDown(KeyCode.A))
+        // {
+        //     if (MapData.instance.
+        //         Debug.Log("Path Found!!!");
+        //     else
+        //         Debug.Log("Path Not Found!!!");
+        // }
 
 
     }
@@ -584,8 +651,14 @@ public class MapData
         string jsonReadData = sr.ReadLine();
 
         MapData md = JsonConvert.DeserializeObject<MapData>(jsonReadData);
+        md.controlQueue = new Queue<ControlBase>();
 
         MapData.instance = md;
+    }
+
+    public void EnqueueControl(ControlBase controlToAdd)
+    {
+        controlQueue.Enqueue(controlToAdd);
     }
 
 }
