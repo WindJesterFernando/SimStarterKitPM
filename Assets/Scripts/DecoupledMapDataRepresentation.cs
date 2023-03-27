@@ -33,6 +33,12 @@ public class MapData
 
     Queue<ControlBase> controlQueue;
 
+    public int characterSpriteID, characterPosX, characterPosY;
+    float lerpToNewTileLocation = -1;
+
+    int characterMoveToPosX, characterMoveToPosY;
+
+
     public void Init()
     {
         controlQueue = new Queue<ControlBase>();
@@ -41,6 +47,11 @@ public class MapData
         mapSprites.AddLast(new MapSpriteDataRepresentation(TextureSpriteID.Fighter1, 10, 2));
         mapSprites.AddLast(new MapSpriteDataRepresentation(TextureSpriteID.BlackMage4, 3, 2));
         mapSprites.AddLast(new MapSpriteDataRepresentation(TextureSpriteID.BlackMage1, 2, 3));
+
+
+        characterSpriteID = TextureSpriteID.BlackMage1;
+        characterPosX = 3;
+        characterPosY = 6;
     }
     private void CreateMapTiles()
     {
@@ -384,7 +395,7 @@ public class MapData
             foreach (TileLocation tl in toBeCheckedTileLocations)
             {
                 //if()
-                Debug.Log("x = " + tl.x + ", y = " + tl.y +  ", h = " + tl.heuristicCost + ", e = " + tl.distanceToEndTile);
+                Debug.Log("x = " + tl.x + ", y = " + tl.y + ", h = " + tl.heuristicCost + ", e = " + tl.distanceToEndTile);
 
                 if (lowestTile == null)
                     lowestTile = tl;
@@ -491,24 +502,66 @@ public class MapData
         {
             ControlBase cb = controlQueue.Dequeue();
 
-            if(cb.controlKey == ControlKey.keyI
+            if (cb.controlKey == ControlKey.keyI
                 && cb.controlKeyState == ControlKeyState.Press)
             {
                 SerializeMapData();
             }
-            else if(cb.controlKey == ControlKey.keyO
+            else if (cb.controlKey == ControlKey.keyO
                 && cb.controlKeyState == ControlKeyState.Press)
             {
                 DeserializeAndLoadMapData();
                 TileEditorLogic.tileEditorLogic.GetComponent<TileEditorLogic>().DestoryMapVisuals();
                 TileEditorLogic.tileEditorLogic.GetComponent<TileEditorLogic>().CreateMapVisuals();
             }
-            else if(cb.controlKey == ControlKey.keyP
+            else if (cb.controlKey == ControlKey.keyP
                 && cb.controlKeyState == ControlKeyState.Press)
             {
                 DoAStarThing(new TileLocation(0, 0), new TileLocation(10, 10));
             }
 
+
+
+            else if (cb.controlKey == ControlKey.keyW
+                && cb.controlKeyState == ControlKeyState.Press)
+            {
+                if (characterPosY < numTilesY -1)
+                {
+                    lerpToNewTileLocation = 0;
+                    characterMoveToPosX = characterPosX;
+                    characterMoveToPosY = characterPosY + 1;
+                }
+            }
+            else if (cb.controlKey == ControlKey.keyA
+                && cb.controlKeyState == ControlKeyState.Press)
+            {
+                if (characterPosX > 0)
+                {
+                    lerpToNewTileLocation = 0;
+                    characterMoveToPosX = characterPosX - 1;
+                    characterMoveToPosY = characterPosY;
+                }
+            }
+            else if (cb.controlKey == ControlKey.keyS
+                && cb.controlKeyState == ControlKeyState.Press)
+            {
+                if (characterPosY > 0)
+                {
+                    lerpToNewTileLocation = 0;
+                    characterMoveToPosX = characterPosX;
+                    characterMoveToPosY = characterPosY - 1;
+                }
+            }
+            else if (cb.controlKey == ControlKey.keyD
+                && cb.controlKeyState == ControlKeyState.Press)
+            {
+                if (characterPosX < numTilesX-1)
+                {
+                    lerpToNewTileLocation = 0;
+                    characterMoveToPosX = characterPosX + 1;
+                    characterMoveToPosY = characterPosY;
+                }
+            }
 
             // if(cb is Control)
             // {
@@ -545,6 +598,18 @@ public class MapData
         //     else
         //         Debug.Log("Path Not Found!!!");
         // }
+
+
+        if (lerpToNewTileLocation != -1)
+        {
+            lerpToNewTileLocation = -1;
+
+            characterPosX = characterMoveToPosX;
+            characterPosY = characterMoveToPosY;
+
+            // TileEditorLogic.tileEditorLogic.GetComponent<TileEditorLogic>().DestoryMapVisuals();
+            // TileEditorLogic.tileEditorLogic.GetComponent<TileEditorLogic>().CreateMapVisuals();
+        }
 
 
     }

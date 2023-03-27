@@ -22,6 +22,8 @@ public partial class TileEditorLogic : MonoBehaviour
     GameObject tileButtonsContainerParent;
     GameObject spriteButtonsContainerParent;
 
+    GameObject character;
+
     #endregion
 
     #region CanvasUI Elements
@@ -171,17 +173,34 @@ public partial class TileEditorLogic : MonoBehaviour
 
 
 
-        if(Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.I))
         {
             MapData.instance.EnqueueControl(new Control(ControlKey.keyI, ControlKeyState.Press));
         }
-        if(Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.O))
         {
             MapData.instance.EnqueueControl(new Control(ControlKey.keyO, ControlKeyState.Press));
         }
-        if(Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P))
         {
             MapData.instance.EnqueueControl(new Control(ControlKey.keyP, ControlKeyState.Press));
+        }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            MapData.instance.EnqueueControl(new Control(ControlKey.keyW, ControlKeyState.Press));
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            MapData.instance.EnqueueControl(new Control(ControlKey.keyA, ControlKeyState.Press));
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            MapData.instance.EnqueueControl(new Control(ControlKey.keyS, ControlKeyState.Press));
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            MapData.instance.EnqueueControl(new Control(ControlKey.keyD, ControlKeyState.Press));
         }
 
 
@@ -213,29 +232,32 @@ public partial class TileEditorLogic : MonoBehaviour
 
         //JsonConvert.DeserializeObject<dynamic>(jsonData);
 
-            // LinkedList<string> lines = new LinkedList<string>();
+        // LinkedList<string> lines = new LinkedList<string>();
 
-            // using (StreamReader r = new StreamReader("sets.json"))
-            // {
-            //     var jsonData = r.ReadToEnd();
-            //     var item = JsonConvert.DeserializeObject<dynamic>(jsonData);
+        // using (StreamReader r = new StreamReader("sets.json"))
+        // {
+        //     var jsonData = r.ReadToEnd();
+        //     var item = JsonConvert.DeserializeObject<dynamic>(jsonData);
 
-            //     foreach (var s in item.data)
-            //     {
-            //         string line = "";
-            //         // try
-            //         // {
-            //         //     Console.WriteLine(s.fjgdjgjg);
-            //         // }
-            //         // catch
-            //         // {
+        //     foreach (var s in item.data)
+        //     {
+        //         string line = "";
+        //         // try
+        //         // {
+        //         //     Console.WriteLine(s.fjgdjgjg);
+        //         // }
+        //         // catch
+        //         // {
 
-            //         // }
-            //         line = s.name + "," + s.search_uri + "," + ((string)s.block) + "," + ((string)s.code) + "," + s.set_type;
-            //         Console.WriteLine(line);
-            //         lines.AddLast(line);
-            //     }
-            // }
+        //         // }
+        //         line = s.name + "," + s.search_uri + "," + ((string)s.block) + "," + ((string)s.code) + "," + s.set_type;
+        //         Console.WriteLine(line);
+        //         lines.AddLast(line);
+        //     }
+        // }
+
+        Vector2 tilePos = mapTiles[MapData.instance.characterPosX, MapData.instance.characterPosY].transform.position;
+        character.transform.position = tilePos;
 
     }
 
@@ -263,14 +285,23 @@ public partial class TileEditorLogic : MonoBehaviour
             currentPos.x += tileVisualSize;
         }
 
+
+        Vector3 tilePos;
         foreach (MapSpriteDataRepresentation s in MapData.instance.mapSprites)
         {
             GameObject go = ContentLoader.GetNewMapSpriteGameObject(s.id);
             go.transform.parent = mapSpritesContainerParent.transform;
-            Vector3 tilePos = mapTiles[s.x, s.y].transform.position;
+            tilePos = mapTiles[s.x, s.y].transform.position;
             go.transform.position = tilePos;
             go.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
         }
+
+
+        character = ContentLoader.GetNewMapSpriteGameObject(MapData.instance.characterSpriteID);
+        character.transform.parent = mapSpritesContainerParent.transform;
+        tilePos = mapTiles[MapData.instance.characterPosX, MapData.instance.characterPosY].transform.position;
+        character.transform.position = tilePos;
+        character.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
     }
 
     public void DestoryMapVisuals()

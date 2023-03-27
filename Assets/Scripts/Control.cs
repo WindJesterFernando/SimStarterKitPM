@@ -48,6 +48,12 @@ public static class ControlKey
     public const int keyO = 2;
     public const int keyP = 3;
 
+
+    public const int keyW = 4;
+    public const int keyA = 5;
+    public const int keyS = 6;
+    public const int keyD = 7;
+
 }
 
 public static class ControlKeyState
@@ -58,6 +64,26 @@ public static class ControlKeyState
     public const int Tap = 3;
     public const int DoubleTap = 4;
 }
+
+
+
+
+
+
+
+/*
+
+Makes a task list
+model data: add character
+Setup Controls (wasd): inputing to model data
+
+update view data to reflect character in model data (on update)
+animate character movement with lerp
+
+
+
+*/
+
 
 
 
